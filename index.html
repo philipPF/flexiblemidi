@@ -1,0 +1,174 @@
+<html>
+	<head>
+		<title>Midi</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+		 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	
+	<style>
+		div.header { display: block; width: 100%; background-color: #37F; padding: 10px; color: white; font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;}
+	</style>
+	</head>
+	<body>		
+	<div class="header">FlexiBLE MIDI</div>
+	
+	<div class="container">	
+		
+		<ul class="nav nav-tabs" id="myTab" role="tablist">
+		  <li class="nav-item">
+			<a class="nav-link active" id="midi-tab" data-toggle="tab" href="#midi" role="tab" aria-controls="midi" aria-selected="true">Midi</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" id="ble-tab" data-toggle="tab" href="#ble" role="tab" aria-controls="ble" aria-selected="false">Bluetooth</a>
+		  </li>
+		</ul>
+		<br/>
+		<div class="tab-content" id="myTabContent">
+		  <div class="tab-pane fade show active" id="midi" role="tabpanel" aria-labelledby="midi-tab">
+			
+			<p class="h4">Midi ports :</p>
+			<div id="midiports"></div>
+			
+			<br/>
+			<input type="button" value="Refresh midi device" id="scanbtn"/>
+			<br/><br/>
+			<input type="button" value="Play test note on usb" id="playnote"/>
+			
+		  </div>
+		  <div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">
+			
+			<input type="button" value="Pair BLE devices" id="scanble"/>		
+			<div id="ble"></div>
+			
+		  </div>
+		</div>
+		
+	
+	
+	</div>
+	
+	
+		
+		
+		
+		
+			<script type="text/javascript">
+			
+			
+			/* ============== 	MIDI I/O PART 	================== */
+			
+			var midiinputs;
+			var midioutputs;
+			var USBmidiout;
+			
+			function onMIDIMessage( event ) {
+				midioutputs.forEach( function(dev) {
+					if (dev.name.indexOf("USB") > -1) {	 // only play note on USB device						
+						dev.send( event.data, event.timestamp ); 
+					}					
+				});							
+			}
+			
+			//$("#scanbtn").click( function () {
+				navigator.requestMIDIAccess()
+				  .then(function(access) {
+
+					 // Get lists of available MIDI controllers
+					 midiinputs = Array.from(access.inputs.values());
+					 midioutputs = Array.from(access.outputs.values());
+					 
+					 displayMidiDevices();
+					 					 
+					 access.onstatechange = function(e) {
+					   // Print information about the (dis)connected MIDI controller
+					   console.log(e.port.name, e.port.manufacturer, e.port.state);
+						midiinputs = Array.from(access.inputs.values());
+						 midioutputs = Array.from(access.outputs.values());
+					   displayMidiDevices();
+					 };
+				  });
+			//});
+			
+			function displayMidiDevices() {
+				$("#midiports").html("");
+				midiinputs.forEach( function(dev) {
+					$("#midiports").append("• " + dev.id + " : " + dev.name + " (" + dev.state + ")<br/>" );
+					if (dev.name.indexOf("reedrum") > -1 || dev.name.indexOf("V7") > -1) {
+						dev.onmidimessage = onMidiMessage;
+					}
+				});			
+				midioutputs.forEach( function(dev) {
+					$("#midiports").append("• " + dev.id + " : " + dev.name + " (" + dev.state + ")<br/>" );
+					if (dev.name.indexOf("USB") > -1) {
+						USBmidiout = dev;
+					}
+				});		
+			}
+			
+			
+			$("#playnote").click( function() {playnote(38);} );
+			
+			
+			function playnote(note) {		
+				var noteOnMessage = [0x90, note, 0x7f];    // note on, middle C, full velocity
+				USBmidiout.send( noteOnMessage );  //omitting the timestamp means send immediately.
+				USBmidiout.send( [0x80, note, 0x40]); // Inlined array creation- note off, middle C,  
+					
+			}
+			
+			/* =============	BLUETOOTH BLE PART 	================== */
+		
+			const MIDI_SERVICE_UID = "03b80e5a-ede8-4b33-a751-6ce34ec4c700";
+			const MIDI_CHAR_DATAIO = "7772e5db-3868-4112-a1a9-f2669d106bf3";
+			
+			var bleservice = null
+			var mididataio;
+			
+			$("#scanble").click( function () {
+				navigator.bluetooth.requestDevice({ filters: [{ services: [MIDI_SERVICE_UID] }] })
+				.then(device => device.gatt.connect())
+				.then(server => server.getPrimaryService(MIDI_SERVICE_UID))
+				.then( service => {
+					bleservice = service;
+					return bleservice.getCharacteristic(MIDI_CHAR_DATAIO);
+				})				
+				.then( characteristic => {
+					mididataio = characteristic;
+					return mididataio.startNotifications();
+				})
+				.then(_ => {
+					console.log('> Notifications started');
+					mididataio.addEventListener('characteristicvaluechanged', handleNotifications);
+				})
+				.catch(error => { console.log(error); });
+			});
+			
+			
+			
+			
+			function handleNotifications(event) {
+				let note = event.target.value.getUint8(3);
+				let act = event.target.value.getUint8(2);
+				  /*let a = [];
+				  for (let i = 0; i < value.byteLength; i++) {
+					a.push( value.getUint8(i) );
+				  }
+				  console.log('> ' + a.join(' '));
+				  if (a[3] == 38 || a[3] == 41 || a[3] == 43 || a[3] == 42) {
+					playnote(a[3]);
+				  }*/
+				if (act==153) // note on
+				{				
+				  if (note == 38 || note == 41 || note == 43 || note == 42) {
+					playnote(note);
+				  }
+				}
+			}
+			
+			
+			</script>
+		
+	</body>
+</html>
