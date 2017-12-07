@@ -5,10 +5,15 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-		 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.js" crossorigin="anonymous"></script>
+		 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">	
 	<style>
 		div.header { display: block; width: 100%; background-color: #37F; padding: 10px; color: white; font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;}
+		.footer {  position: absolute;  bottom: 0;  width: 100%; height: 60px;  line-height: 60px;  background-color: #f5f5f5; font-size:0.8em; text-align: center;}
+		body {  margin-bottom: 60px;}
+		html {  position: relative;  min-height: 100%;}
+		body > .container {  padding-bottom: 60px; }
+		#legalnotice { font-size: 0.7em; margin-top: 30px; text-align: center;}
 	</style>
 	</head>
 	<body>		
@@ -18,15 +23,45 @@
 		
 		<ul class="nav nav-tabs" id="myTab" role="tablist">
 		  <li class="nav-item">
-			<a class="nav-link active" id="midi-tab" data-toggle="tab" href="#midi" role="tab" aria-controls="midi" aria-selected="true">Midi</a>
+			<a class="nav-link active" id="about-tab" data-toggle="tab" href="#about" role="tab" aria-controls="about" aria-selected="true">About</a>
+		  </li>
+		  <li class="nav-item">
+			<a class="nav-link" id="midi-tab" data-toggle="tab" href="#midi" role="tab" aria-controls="midi" aria-selected="false">Midi</a>
 		  </li>
 		  <li class="nav-item">
 			<a class="nav-link" id="ble-tab" data-toggle="tab" href="#ble" role="tab" aria-controls="ble" aria-selected="false">Bluetooth</a>
 		  </li>
+		   <!--<li class="nav-item">
+			<a class="nav-link" id="sound-tab" data-toggle="tab" href="#sound" role="tab" aria-controls="sound" aria-selected="false">Sound</a>
+		  </li>-->
 		</ul>
 		<br/>
+				
 		<div class="tab-content" id="myTabContent">
-		  <div class="tab-pane fade show active" id="midi" role="tabpanel" aria-labelledby="midi-tab">
+		
+		
+		<!-- ABOUT PANEL -->
+		<div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
+			
+			<p>FlexiBLE MIDI is a webpage created in 2017 to help people connecting bluetooth midi equipement on their android device, and being able to send midi informations via USB.</p>
+			<p>It is based on :</p>
+			<ul>
+				<li><a href="https://www.chromestatus.com/feature/4923613069180928" target="_blank">MIDI Web API</a></li>
+				<li><a href="https://www.chromestatus.com/feature/5264933985976320" target="_blank">Bluetooth BLE Web API</a></li>
+			</ul>
+			
+			<p class="alert alert-warning" ><b>To use bluetooth on web, you need to :</b><br/>
+				- activate the enable-experimental-web-platform-features in their Chrome configuration (copy paste this adress : chrome://flags/#enable-experimental-web-platform-features )<br/>
+				- access this site with HTTPS
+			</p>
+			<p class="alert alert-primary" style="text-align: center;">
+				These API are EXPERIMENTAL.<br/>(Tested on Android 7.1.1 / Chrome 62)
+			</p>			
+		</div>
+		
+		
+		<!-- MIDI PANEL -->
+		  <div class="tab-pane fade" id="midi" role="tabpanel" aria-labelledby="midi-tab">
 			
 			<p class="h4">Midi ports :</p>
 			<div id="midiports"></div>
@@ -37,31 +72,89 @@
 			<input type="button" value="Play test note on usb" id="playnote"/>
 			
 		  </div>
-		  <div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">
-			
-			<input type="button" value="Pair BLE devices" id="scanble"/>		
-			<div id="ble"></div>
-			
-		  </div>
+		    		  		  
+				  
+		<!-- BLUETOOTH PANEL -->
+		<div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">
+
+		<input type="button" value="Pair BLE devices" id="scanble"/>		
+		<div id="bletable"></div>
+
+		</div>
+		  
+
+		<!-- SOUND PANEL -->
+		<div class="tab-pane fade" id="sound" role="tabpanel" aria-labelledby="sound-tab">
+		<input type="button" value="init sounds" onclick="playsnare();"/>
+		</div>
+
+		  
+		  
 		</div>
 		
-	
-	
 	</div>
 	
+	<!-- LEGAL NOTICE -->
+		<div id="legalnotice" class="modal fade" role="dialog" ><div class="modal-dialog"><div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Legal Notice</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			</div>
+			<div class="modal-body" style="display: block; height: 50%; overflow: scroll;">
+				<p class="h5">MIT License<p>		
+				<p class="h6">Copyright (c) 2017 PhilipPF (LAMOUROUX PHILIPPE)</p>				
+				Permission is hereby granted, free of charge, to any person obtaining a copy
+				of this software and associated documentation files (the "Software"), to deal
+				in the Software without restriction, including without limitation the rights
+				to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+				copies of the Software, and to permit persons to whom the Software is
+				furnished to do so, subject to the following conditions:
+				<br/><br/>
+				The above copyright notice and this permission notice shall be included in all
+				copies or substantial portions of the Software.
+				<br/><br/>
+				THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+				IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+				FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+				AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+				LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+				OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+				SOFTWARE.
+			</div>
+		</div></div></div>
+
 	
-		
-		
-		
+	
+	 <footer class="footer">
+      <div class="container">
+        <span class="text-muted" onclick='$("#legalnotice").modal();'>Legal Notice</span>
+      </div>
+    </footer>
+
 		
 			<script type="text/javascript">
+			
+			/* ========== MISC ========= */
+			
+			
+			/* ======== WEB AUDIO API PART (using HOWLER) ============== */
+			
+			var snaresound = new Howl({
+			  src: ['http://freewavesamples.com/files/Korg-TR-Rack-Standard-Kit-Snare-Drum-6.wav']
+			})
+			
+			function playsnare() {	
+				snaresound.play();
+			}
 			
 			
 			/* ============== 	MIDI I/O PART 	================== */
 			
 			var midiinputs;
 			var midioutputs;
-			var USBmidiout;
+			let USBmidiout = null;
 			
 			function onMIDIMessage( event ) {
 				midioutputs.forEach( function(dev) {
@@ -94,29 +187,35 @@
 			function displayMidiDevices() {
 				$("#midiports").html("");
 				midiinputs.forEach( function(dev) {
-					$("#midiports").append("• " + dev.id + " : " + dev.name + " (" + dev.state + ")<br/>" );
+					$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"'> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );
 					if (dev.name.indexOf("reedrum") > -1 || dev.name.indexOf("V7") > -1) {
 						dev.onmidimessage = onMidiMessage;
 					}
 				});			
 				midioutputs.forEach( function(dev) {
-					$("#midiports").append("• " + dev.id + " : " + dev.name + " (" + dev.state + ")<br/>" );
 					if (dev.name.indexOf("USB") > -1) {
 						USBmidiout = dev;
+						$("#midiports").append("<p class='alert alert-success' id='"+dev.id+"'> <span class='badge badge-success'>SELECTED</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );	
+					} else {
+						$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"'> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );					
 					}
 				});		
 			}
 			
 			
-			$("#playnote").click( function() {playnote(38);} );
+			$("#playnote").click( function() {playnote(38,100);} );
 			
 			
-			function playnote(note) {		
-				var noteOnMessage = [0x90, note, 0x7f];    // note on, middle C, full velocity
-				USBmidiout.send( noteOnMessage );  //omitting the timestamp means send immediately.
-				USBmidiout.send( [0x80, note, 0x40]); // Inlined array creation- note off, middle C,  
-					
+			function playnote(note,vel) {	
+				if (USBmidiout != null)	 {
+					var noteOnMessage = [0x90, note, vel];    // note on, middle C, full velocity
+					USBmidiout.send( noteOnMessage );  //omitting the timestamp means send immediately.
+					USBmidiout.send( [0x80, note, 0x40]); // Inlined array creation- note off, middle C,  
+				}					
 			}
+			
+			
+			
 			
 			/* =============	BLUETOOTH BLE PART 	================== */
 		
@@ -126,9 +225,32 @@
 			var bleservice = null
 			var mididataio;
 			
+			var bledevices = [];
+			
+			function refreshBleTable() {
+				$("#bletable").html("");
+				bledevices.forEach(function(device,index) {
+					$("#bletable").append("• " + device.name + " <i>" + device.id.substring(0,5) + "...</i><input type='button' onclick='disconnectble("+index+")' value='disconnect'/><br/>");
+				});
+			}
+			function pushdevice(device) {
+				bledevices.push(device);
+				refreshBleTable();
+			}
+			
+			function disconnectble(deviceindex) {
+				bledevices[deviceindex].gatt.disconnect();
+			}
+			
+			setInterval(refreshBleTable, 5000);
+			
 			$("#scanble").click( function () {
 				navigator.bluetooth.requestDevice({ filters: [{ services: [MIDI_SERVICE_UID] }] })
-				.then(device => device.gatt.connect())
+				.then(device => {
+					var serv = device.gatt.connect();
+					pushdevice(device);
+					return serv;
+				})
 				.then(server => server.getPrimaryService(MIDI_SERVICE_UID))
 				.then( service => {
 					bleservice = service;
@@ -149,8 +271,9 @@
 			
 			
 			function handleNotifications(event) {
-				let note = event.target.value.getUint8(3);
 				let act = event.target.value.getUint8(2);
+				let note = event.target.value.getUint8(3);				
+				let vel = event.target.value.getUint8(4);
 				  /*let a = [];
 				  for (let i = 0; i < value.byteLength; i++) {
 					a.push( value.getUint8(i) );
@@ -160,10 +283,8 @@
 					playnote(a[3]);
 				  }*/
 				if (act==153) // note on
-				{				
-				  if (note == 38 || note == 41 || note == 43 || note == 42) {
-					playnote(note);
-				  }
+				{	
+					playnote(note,vel);				  
 				}
 			}
 			
