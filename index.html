@@ -14,6 +14,8 @@
 		html {  position: relative;  min-height: 100%;}
 		body > .container {  padding-bottom: 60px; }
 		#legalnotice { font-size: 0.7em; margin-top: 30px; text-align: center;}
+		span.badge { border: 4px solid black; margin-right: 10px; }
+		
 	</style>
 	</head>
 	<body>		
@@ -67,19 +69,18 @@
 			<div id="midiports"></div>
 			
 			<br/>
-			<input type="button" value="Refresh midi device" id="scanbtn"/>
+			<input type="button" value="Refresh midi device" id="scanbtn" class="btn btn-primary"/>
 			<br/><br/>
-			<input type="button" value="Play test note on usb" id="playnote"/>
+			<input type="button" value="Play test note on usb" id="playnote" class="btn btn-primary"/>
 			
 		  </div>
 		    		  		  
 				  
 		<!-- BLUETOOTH PANEL -->
-		<div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">
-
-		<input type="button" value="Pair BLE devices" id="scanble"/>		
+		<div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">		
 		<div id="bletable"></div>
-
+		<hr/>
+		<input type="button" value="Scan for BLE devices to pair" id="scanble" class="btn btn-primary"/>	
 		</div>
 		  
 
@@ -155,6 +156,7 @@
 			var midiinputs;
 			var midioutputs;
 			let USBmidiout = null;
+			var userSelOutput = null;
 			
 			function onMIDIMessage( event ) {
 				midioutputs.forEach( function(dev) {
@@ -187,19 +189,30 @@
 			function displayMidiDevices() {
 				$("#midiports").html("");
 				midiinputs.forEach( function(dev) {
-					$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"'> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );
+					$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"'> <span class='badge badge-secondary'>IN</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );
 					if (dev.name.indexOf("reedrum") > -1 || dev.name.indexOf("V7") > -1) {
 						dev.onmidimessage = onMidiMessage;
 					}
 				});			
-				midioutputs.forEach( function(dev) {
-					if (dev.name.indexOf("USB") > -1) {
+				midioutputs.forEach( function(dev, idx) {
+					if ( getMidiId(idx) == userSelOutput 		|| 		(userSelOutput == null && dev.name.indexOf("USB") > -1) ) {
 						USBmidiout = dev;
-						$("#midiports").append("<p class='alert alert-success' id='"+dev.id+"'> <span class='badge badge-success'>SELECTED</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );	
+						$("#midiports").append("<p class='alert alert-success' id='"+dev.id+"' onclick='selectMidiOut("+idx+");'> <span class='badge badge-success'>SELECTED OUT</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );	
 					} else {
-						$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"'> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );					
+						$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"' onclick='selectMidiOut("+idx+");'> <span class='badge badge-secondary'>OUT</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );					
 					}
 				});		
+			}
+			
+			
+			function selectMidiOut(idx) {
+				USBmidiout = midioutputs[idx];
+				userSelOutput = getMidiId(idx);
+				displayMidiDevices();
+			}
+			
+			function getMidiId(id) {
+				return "midi"+id;
 			}
 			
 			
@@ -230,11 +243,19 @@
 			function refreshBleTable() {
 				$("#bletable").html("");
 				bledevices.forEach(function(device,index) {
-					$("#bletable").append("• " + device.name + " <i>" + device.id.substring(0,5) + "...</i><input type='button' onclick='disconnectble("+index+")' value='disconnect'/><br/>");
+					if (device.gatt.connected) {
+						$("#bletable").append("<span class='badge badge-success'>OK</span>" + device.name + " <i>" + device.id.substring(0,5) + "...</i> <input style='margin-left: 10px;' class='btn btn-sm btn-danger' type='button' onclick='disconnectble("+index+")' value='disconnect'/><br/>");
+					} else {
+						$("#bletable").append("<span class='badge badge-secondary'>KO</span>" + device.name + " <i>" + device.id.substring(0,5) + "...</i><br/>");
+					}
 				});
 			}
 			function pushdevice(device) {
-				bledevices.push(device);
+				var found = false;
+				bledevices.forEach(function(dev) {
+					if (device.id == dev.id) { found = true; }
+				});
+				if (!found) { bledevices.push(device); }
 				refreshBleTable();
 			}
 			
@@ -242,7 +263,7 @@
 				bledevices[deviceindex].gatt.disconnect();
 			}
 			
-			setInterval(refreshBleTable, 5000);
+			setInterval(refreshBleTable, 2000);
 			
 			$("#scanble").click( function () {
 				navigator.bluetooth.requestDevice({ filters: [{ services: [MIDI_SERVICE_UID] }] })
