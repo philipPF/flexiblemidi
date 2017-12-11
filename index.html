@@ -45,33 +45,47 @@
 		<!-- ABOUT PANEL -->
 		<div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
 			
-			<p>FlexiBLE MIDI is a webpage created in 2017 to help people connecting bluetooth midi equipement on their android device, and being able to send midi informations via USB.</p>
-			<p>It is based on :</p>
+			<p>FlexiBLE MIDI is a webpage created in december 2017 for Chrome on Android phone, to :<br/>
+			<ul>
+				<li>Pair one or multiple bluetooth MIDI devices (like Korg microKey Air, Freedrums, etc...)</li>
+				<li>Redirect the device's MIDI data to any available MIDI OUT (like USB midi out)</li>
+			</ul>
+			<p>Main utility is to be able to <b>use bluetooth MIDI devices on older computers (running Windows 7, etc...), by using an Android phone as a proxy</b>. 
+			<hr/>
+			<p class="h3">How does it works ?</p>
+			First, use the Bluetooth tab to pair your bluetooth devices, by clicking the "Scan for BLE devices to pair". You'll have to ensure that your browser is configured to allow bluetooth (see Chrome flag, enabling web experimental features).
+			<br/><br/>
+			Then, once the device is correctly paired, Go to the midi tab and select the Midi output you want to use. For example, if you connect your android phone on a computer with USB cable, you can select "Midi over USB", then you'll be able to select the USB midi output.
+			<br/><br/>
+			Finally, on your computer (in your favorite DAW software), you should be able to see the phone midi output as an input for all your VSTi / other stuff.
+			<hr/>
+			<p class="h3">Which compatibility ?</p>
+			The code on this page is based on :</p>
 			<ul>
 				<li><a href="https://www.chromestatus.com/feature/4923613069180928" target="_blank">MIDI Web API</a></li>
 				<li><a href="https://www.chromestatus.com/feature/5264933985976320" target="_blank">Bluetooth BLE Web API</a></li>
-			</ul>
-			
-			<p class="alert alert-warning" ><b>To use bluetooth on web, you need to :</b><br/>
-				- activate the enable-experimental-web-platform-features in their Chrome configuration (copy paste this adress : chrome://flags/#enable-experimental-web-platform-features )<br/>
-				- access this site with HTTPS
-			</p>
+			</ul>		
 			<p class="alert alert-primary" style="text-align: center;">
 				These API are EXPERIMENTAL.<br/>(Tested on Android 7.1.1 / Chrome 62)
-			</p>			
+			</p>		
+			Unfortunately, Bluetooth Web API is a really new features, and at the moment <b>it only works in Chrome browser on PC or Android Phone</b>. Chrome for iOS is a different software, and will not yet allow you to use Bluetooth Web API. Hope for iPhone owners that it will change soon, anyway they can try some native iOS apps like Midifire / Midimux.
+			<hr/>
+			<p class="h3">Not enough ?</p>
+			The project is also on Github : <a href="https://github.com/philipPF/flexiblemidi" target="_blank">https://github.com/philipPF/flexiblemidi</a><br/>
+			You can extend it to your needs, or contact me if you wish to see other functions (like a sound sampler, or whatever), I'll try to help !
 		</div>
 		
 		
 		<!-- MIDI PANEL -->
 		  <div class="tab-pane fade" id="midi" role="tabpanel" aria-labelledby="midi-tab">
 			
-			<p class="h4">Midi ports :</p>
+			<p class="h4">Select midi output :</p>
 			<div id="midiports"></div>
 			
 			<br/>
-			<input type="button" value="Refresh midi device" id="scanbtn" class="btn btn-primary"/>
+			<input type="button" value="Refresh midi outputs" id="scanbtn" class="btn btn-primary"/>
 			<br/><br/>
-			<input type="button" value="Play test note on usb" id="playnote" class="btn btn-primary"/>
+			<input type="button" value="Play test note" id="playnote" class="btn btn-primary"/>
 			
 		  </div>
 		    		  		  
@@ -81,6 +95,12 @@
 		<div id="bletable"></div>
 		<hr/>
 		<input type="button" value="Scan for BLE devices to pair" id="scanble" class="btn btn-primary"/>	
+		<br/><br/>
+		<p class="alert alert-danger" ><b>To use bluetooth / web API, you need to :</b><br/>
+				- activate the enable-experimental-web-platform-features in Chrome configuration flags(copy paste this adress : chrome://flags/#enable-experimental-web-platform-features )<br/>
+				- access this site with HTTPS
+			</p>
+		
 		</div>
 		  
 
@@ -127,10 +147,26 @@
 		</div></div></div>
 
 	
+	<!-- CONTACT ME -->
+		<div id="contactme" class="modal fade" role="dialog" ><div class="modal-dialog"><div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Contact</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+			</div>
+			<div class="modal-body" style="display: block; height: 30%; overflow: scroll;">
+				<p class="h6">You can contact me on <a href="https://www.facebook.com/lamouroux.philippe" target="_blank">Facebook</a> or by e-mail at <a href="mailto:flexiblemidi@outlook.com">flexiblemidi@outlook.com</a>
+					
+			</div>
+		</div></div></div>
+		
 	
 	 <footer class="footer">
       <div class="container">
         <span class="text-muted" onclick='$("#legalnotice").modal();'>Legal Notice</span>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<span class="text-muted" onclick='$("#contactme").modal();'>Contact me</span>
       </div>
     </footer>
 
