@@ -1,352 +1,840 @@
 <html>
-	<head>
-		<title>Midi</title>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.js" crossorigin="anonymous"></script>
-		 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">	
-	<style>
-		div.header { display: block; width: 100%; background-color: #37F; padding: 10px; color: white; font-size: 1.5em; font-weight: bold; text-align: center; margin-bottom: 20px;}
-		.footer {  position: absolute;  bottom: 0;  width: 100%; height: 60px;  line-height: 60px;  background-color: #f5f5f5; font-size:0.8em; text-align: center;}
-		body {  margin-bottom: 60px;}
-		html {  position: relative;  min-height: 100%;}
-		body > .container {  padding-bottom: 60px; }
-		#legalnotice { font-size: 0.7em; margin-top: 30px; text-align: center;}
-		span.badge { border: 4px solid black; margin-right: 10px; }
-		
-	</style>
-	</head>
-	<body>		
-	<div class="header">FlexiBLE MIDI</div>
-	
-	<div class="container">	
-		
-		<ul class="nav nav-tabs" id="myTab" role="tablist">
-		  <li class="nav-item">
-			<a class="nav-link active" id="about-tab" data-toggle="tab" href="#about" role="tab" aria-controls="about" aria-selected="true">About</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link" id="midi-tab" data-toggle="tab" href="#midi" role="tab" aria-controls="midi" aria-selected="false">Midi</a>
-		  </li>
-		  <li class="nav-item">
-			<a class="nav-link" id="ble-tab" data-toggle="tab" href="#ble" role="tab" aria-controls="ble" aria-selected="false">Bluetooth</a>
-		  </li>
-		   <!--<li class="nav-item">
-			<a class="nav-link" id="sound-tab" data-toggle="tab" href="#sound" role="tab" aria-controls="sound" aria-selected="false">Sound</a>
-		  </li>-->
-		</ul>
-		<br/>
-				
-		<div class="tab-content" id="myTabContent">
-		
-		
-		<!-- ABOUT PANEL -->
-		<div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
-			
-			<p>FlexiBLE MIDI is a webpage created in december 2017 for Chrome on Android phone, to :<br/>
-			<ul>
-				<li>Pair one or multiple bluetooth MIDI devices (like Korg microKey Air, Freedrums, etc...)</li>
-				<li>Redirect the device's MIDI data to any available MIDI OUT (like USB midi out)</li>
-			</ul>
-			<p>Main utility is to be able to <b>use bluetooth MIDI devices on older computers (running Windows 7, etc...), by using an Android phone as a proxy</b>. 
-			<hr/>
-			<p class="h3">How does it works ?</p>
-			First, use the Bluetooth tab to pair your bluetooth devices, by clicking the "Scan for BLE devices to pair". You'll have to ensure that your browser is configured to allow bluetooth (see Chrome flag, enabling web experimental features).
-			<br/><br/>
-			Then, once the device is correctly paired, Go to the midi tab and select the Midi output you want to use. For example, if you connect your android phone on a computer with USB cable, you can select "Midi over USB", then you'll be able to select the USB midi output.
-			<br/><br/>
-			Finally, on your computer (in your favorite DAW software), you should be able to see the phone midi output as an input for all your VSTi / other stuff.
-			<hr/>
-			<p class="h3">Which compatibility ?</p>
-			The code on this page is based on :</p>
-			<ul>
-				<li><a href="https://www.chromestatus.com/feature/4923613069180928" target="_blank">MIDI Web API</a></li>
-				<li><a href="https://www.chromestatus.com/feature/5264933985976320" target="_blank">Bluetooth BLE Web API</a></li>
-			</ul>		
-			<p class="alert alert-primary" style="text-align: center;">
-				These API are EXPERIMENTAL.<br/>(Tested on Android 7.1.1 / Chrome 62)
-			</p>		
-			Unfortunately, Bluetooth Web API is a really new features, and at the moment <b>it only works in Chrome browser on PC or Android Phone</b>. Chrome for iOS is a different software, and will not yet allow you to use Bluetooth Web API. Hope for iPhone owners that it will change soon, anyway they can try some native iOS apps like Midifire / Midimux.
-			<hr/>
-			<p class="h3">Not enough ?</p>
-			The project is also on Github : <a href="https://github.com/philipPF/flexiblemidi" target="_blank">https://github.com/philipPF/flexiblemidi</a><br/>
-			You can extend it to your needs, or contact me if you wish to see other functions (like a sound sampler, or whatever), I'll try to help !
-		</div>
-		
-		
-		<!-- MIDI PANEL -->
-		  <div class="tab-pane fade" id="midi" role="tabpanel" aria-labelledby="midi-tab">
-			
-			<p class="h4">Select midi output :</p>
-			<div id="midiports"></div>
-			
-			<br/>
-			<input type="button" value="Refresh midi outputs" id="scanbtn" class="btn btn-primary"/>
-			<br/><br/>
-			<input type="button" value="Play test note" id="playnote" class="btn btn-primary"/>
-			
-		  </div>
-		    		  		  
-				  
-		<!-- BLUETOOTH PANEL -->
-		<div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">		
-		<div id="bletable"></div>
-		<hr/>
-		<input type="button" value="Scan for BLE devices to pair" id="scanble" class="btn btn-primary"/>	
-		<br/><br/>
-		<p class="alert alert-danger" ><b>To use bluetooth / web API, you need to :</b><br/>
-				- activate the enable-experimental-web-platform-features in Chrome configuration flags(copy paste this adress : chrome://flags/#enable-experimental-web-platform-features )<br/>
-				- access this site with HTTPS
-			</p>
-		
-		</div>
-		  
+<head>
+    <title>Midi</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.0.5/howler.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        div.header {
+            display: block;
+            width: 100%;
+            background-color: #37F;
+            padding: 10px;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-		<!-- SOUND PANEL -->
-		<div class="tab-pane fade" id="sound" role="tabpanel" aria-labelledby="sound-tab">
-		<input type="button" value="init sounds" onclick="playsnare();"/>
-		</div>
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            line-height: 60px;
+            background-color: #f5f5f5;
+            font-size: 0.8em;
+            text-align: center;
+        }
 
-		  
-		  
-		</div>
-		
-	</div>
-	
-	<!-- LEGAL NOTICE -->
-		<div id="legalnotice" class="modal fade" role="dialog" ><div class="modal-dialog"><div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Legal Notice</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-			</div>
-			<div class="modal-body" style="display: block; height: 50%; overflow: scroll;">
-				<p class="h5">MIT License<p>		
-				<p class="h6">Copyright (c) 2017 PhilipPF (LAMOUROUX PHILIPPE)</p>				
-				Permission is hereby granted, free of charge, to any person obtaining a copy
-				of this software and associated documentation files (the "Software"), to deal
-				in the Software without restriction, including without limitation the rights
-				to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-				copies of the Software, and to permit persons to whom the Software is
-				furnished to do so, subject to the following conditions:
-				<br/><br/>
-				The above copyright notice and this permission notice shall be included in all
-				copies or substantial portions of the Software.
-				<br/><br/>
-				THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-				IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-				FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-				AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-				LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-				OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-				SOFTWARE.
-			</div>
-		</div></div></div>
+        body {
+            margin-bottom: 60px;
+        }
 
-	
-	<!-- CONTACT ME -->
-		<div id="contactme" class="modal fade" role="dialog" ><div class="modal-dialog"><div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Contact</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-				<span aria-hidden="true">&times;</span>
-			</button>
-			</div>
-			<div class="modal-body" style="display: block; height: 30%; overflow: scroll;">
-				<p class="h6">You can contact me on <a href="https://www.facebook.com/lamouroux.philippe" target="_blank">Facebook</a> or by e-mail at <a href="mailto:flexiblemidi@outlook.com">flexiblemidi@outlook.com</a>
-					
-			</div>
-		</div></div></div>
-		
-	
-	 <footer class="footer">
-      <div class="container">
-        <span class="text-muted" onclick='$("#legalnotice").modal();'>Legal Notice</span>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<span class="text-muted" onclick='$("#contactme").modal();'>Contact me</span>
-      </div>
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        body > .container {
+            padding-bottom: 60px;
+        }
+
+        #legalnotice {
+            font-size: 0.7em;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        span.badge {
+            border: 4px solid black;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">FlexiBLE MIDI</div>
+
+    <div class="container">
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="about-tab" data-toggle="tab" href="#about" role="tab" aria-controls="about" aria-selected="true">About</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="midi-tab" data-toggle="tab" href="#midi" role="tab" aria-controls="midi" aria-selected="false">Midi</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="ble-tab" data-toggle="tab" href="#ble" role="tab" aria-controls="ble" aria-selected="false">Bluetooth</a>
+            </li>
+            <!--<li class="nav-item">
+              <a class="nav-link" id="sound-tab" data-toggle="tab" href="#sound" role="tab" aria-controls="sound" aria-selected="false">Sound</a>
+            </li>-->
+        </ul>
+        <br />
+
+        <div class="tab-content" id="myTabContent">
+
+
+            <!-- ABOUT PANEL -->
+            <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="about-tab">
+
+                <p>
+                    FlexiBLE MIDI is a webpage created in december 2017 for Chrome on Android phone, to :<br />
+                    <ul>
+                        <li>Pair one or multiple bluetooth MIDI devices (like Korg microKey Air, Freedrums, etc...)</li>
+                        <li>Redirect the device's MIDI data to any available MIDI OUT (like USB midi out)</li>
+                    </ul>
+                <p>
+                    Main utility is to be able to <b>use bluetooth MIDI devices on older computers (running Windows 7, etc...), by using an Android phone as a proxy</b>.
+                    <hr />
+                <p class="h3">How does it works ?</p>
+                First, use the Bluetooth tab to pair your bluetooth devices, by clicking the "Scan for BLE devices to pair". You'll have to ensure that your browser is configured to allow bluetooth (see Chrome flag, enabling web experimental features).
+                <br /><br />
+                Then, once the device is correctly paired, Go to the midi tab and select the Midi output you want to use. For example, if you connect your android phone on a computer with USB cable, you can select "Midi over USB", then you'll be able to select the USB midi output.
+                <br /><br />
+                Finally, on your computer (in your favorite DAW software), you should be able to see the phone midi output as an input for all your VSTi / other stuff.
+                <hr />
+                <p class="h3">Which compatibility ?</p>
+                The code on this page is based on :</p>
+                <ul>
+                    <li><a href="https://www.chromestatus.com/feature/4923613069180928" target="_blank">MIDI Web API</a></li>
+                    <li><a href="https://www.chromestatus.com/feature/5264933985976320" target="_blank">Bluetooth BLE Web API</a></li>
+                </ul>
+                <p class="alert alert-primary" style="text-align: center;">
+                    These API are EXPERIMENTAL.<br />(Tested on Android 7.1.1 / Chrome 62)
+                </p>
+                Unfortunately, Bluetooth Web API is a really new features, and at the moment <b>it only works in Chrome browser on PC or Android Phone</b>. Chrome for iOS is a different software, and will not yet allow you to use Bluetooth Web API. Hope for iPhone owners that it will change soon, anyway they can try some native iOS apps like Midifire / Midimux.
+                <hr />
+                <p class="h3">Not enough ?</p>
+                The project is also on Github : <a href="https://github.com/philipPF/flexiblemidi" target="_blank">https://github.com/philipPF/flexiblemidi</a><br />
+                You can extend it to your needs, or contact me if you wish to see other functions (like a sound sampler, or whatever), I'll try to help !
+            </div>
+
+
+            <!-- MIDI PANEL -->
+            <div class="tab-pane fade" id="midi" role="tabpanel" aria-labelledby="midi-tab">
+
+                <p class="h4">Select midi output :</p>
+                <div id="midiports"></div>
+
+                <br />
+                <input type="button" value="Refresh midi outputs" id="scanbtn" class="btn btn-primary" />
+                <br /><br />
+                <input type="button" value="Play test note" id="playnote" class="btn btn-primary" />
+
+            </div>
+
+
+            <!-- BLUETOOTH PANEL -->
+            <div class="tab-pane fade" id="ble" role="tabpanel" aria-labelledby="ble-tab">
+                <div id="bletable"></div>
+                <hr />
+                <input type="button" value="Scan for BLE devices to pair" id="scanble" class="btn btn-primary" />
+                <br /><br />
+                <p class="alert alert-danger">
+                    <b>To use bluetooth / web API, you need to :</b><br />
+                    - activate the enable-experimental-web-platform-features in Chrome configuration flags(copy paste this adress : chrome://flags/#enable-experimental-web-platform-features )<br />
+                    - access this site with HTTPS
+                </p>
+
+            </div>
+
+
+            <!-- SOUND PANEL -->
+            <div class="tab-pane fade" id="sound" role="tabpanel" aria-labelledby="sound-tab">
+                <input type="button" value="init sounds" onclick="playsnare();" />
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    <!-- LEGAL NOTICE -->
+    <div id="legalnotice" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Legal Notice</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="display: block; height: 50%; overflow: scroll;">
+                    <p class="h5">MIT License<p>
+                    <p class="h6">Copyright (c) 2017 PhilipPF (LAMOUROUX PHILIPPE)</p>
+                    Permission is hereby granted, free of charge, to any person obtaining a copy
+                    of this software and associated documentation files (the "Software"), to deal
+                    in the Software without restriction, including without limitation the rights
+                    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+                    copies of the Software, and to permit persons to whom the Software is
+                    furnished to do so, subject to the following conditions:
+                    <br /><br />
+                    The above copyright notice and this permission notice shall be included in all
+                    copies or substantial portions of the Software.
+                    <br /><br />
+                    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+                    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+                    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+                    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+                    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+                    SOFTWARE.
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- CONTACT ME -->
+    <div id="contactme" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Contact</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="display: block; height: 30%; overflow: scroll;">
+                    <p class="h6">You can contact me on <a href="https://www.facebook.com/lamouroux.philippe" target="_blank">Facebook</a> or by e-mail at <a href="mailto:flexiblemidi@outlook.com">flexiblemidi@outlook.com</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="footer">
+        <div class="container">
+            <span class="text-muted" onclick='$("#legalnotice").modal();'>Legal Notice</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="text-muted" onclick='$("#contactme").modal();'>Contact me</span>
+        </div>
     </footer>
 
-		
-			<script type="text/javascript">
-			
-			/* ========== MISC ========= */
-			
-			
-			/* ======== WEB AUDIO API PART (using HOWLER) ============== */
-			
-			var snaresound = new Howl({
-			  src: ['http://freewavesamples.com/files/Korg-TR-Rack-Standard-Kit-Snare-Drum-6.wav']
-			})
-			
-			function playsnare() {	
-				snaresound.play();
-			}
-			
-			
-			/* ============== 	MIDI I/O PART 	================== */
-			
-			var midiinputs;
-			var midioutputs;
-			let USBmidiout = null;
-			var userSelOutput = null;
-			
-			function onMIDIMessage( event ) {
-				midioutputs.forEach( function(dev) {
-					if (dev.name.indexOf("USB") > -1) {	 // only play note on USB device						
-						dev.send( event.data, event.timestamp ); 
-					}					
-				});							
-			}
-			
-			//$("#scanbtn").click( function () {
-				navigator.requestMIDIAccess()
-				  .then(function(access) {
 
-					 // Get lists of available MIDI controllers
-					 midiinputs = Array.from(access.inputs.values());
-					 midioutputs = Array.from(access.outputs.values());
-					 
-					 displayMidiDevices();
-					 					 
-					 access.onstatechange = function(e) {
-					   // Print information about the (dis)connected MIDI controller
-					   console.log(e.port.name, e.port.manufacturer, e.port.state);
-						midiinputs = Array.from(access.inputs.values());
-						 midioutputs = Array.from(access.outputs.values());
-					   displayMidiDevices();
-					 };
-				  });
-			//});
-			
-			function displayMidiDevices() {
-				$("#midiports").html("");
-				midiinputs.forEach( function(dev) {
-					$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"'> <span class='badge badge-secondary'>IN</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );
-					if (dev.name.indexOf("reedrum") > -1 || dev.name.indexOf("V7") > -1) {
-						dev.onmidimessage = onMidiMessage;
-					}
-				});			
-				midioutputs.forEach( function(dev, idx) {
-					if ( getMidiId(idx) == userSelOutput 		|| 		(userSelOutput == null && dev.name.indexOf("USB") > -1) ) {
-						USBmidiout = dev;
-						$("#midiports").append("<p class='alert alert-success' id='"+dev.id+"' onclick='selectMidiOut("+idx+");'> <span class='badge badge-success'>SELECTED OUT</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );	
-					} else {
-						$("#midiports").append("<p class='alert alert-secondary' id='"+dev.id+"' onclick='selectMidiOut("+idx+");'> <span class='badge badge-secondary'>OUT</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>" );					
-					}
-				});		
-			}
-			
-			
-			function selectMidiOut(idx) {
-				USBmidiout = midioutputs[idx];
-				userSelOutput = getMidiId(idx);
-				displayMidiDevices();
-			}
-			
-			function getMidiId(id) {
-				return "midi"+id;
-			}
-			
-			
-			$("#playnote").click( function() {playnote(38,100);} );
-			
-			
-			function playnote(note,vel) {	
-				if (USBmidiout != null)	 {
-					var noteOnMessage = [0x90, note, vel];    // note on, middle C, full velocity
-					USBmidiout.send( noteOnMessage );  //omitting the timestamp means send immediately.
-					USBmidiout.send( [0x80, note, 0x40]); // Inlined array creation- note off, middle C,  
-				}					
-			}
-			
-			
-			
-			
-			/* =============	BLUETOOTH BLE PART 	================== */
-		
-			const MIDI_SERVICE_UID = "03b80e5a-ede8-4b33-a751-6ce34ec4c700";
-			const MIDI_CHAR_DATAIO = "7772e5db-3868-4112-a1a9-f2669d106bf3";
-			
-			var bleservice = null
-			var mididataio;
-			
-			var bledevices = [];
-			
-			function refreshBleTable() {
-				$("#bletable").html("");
-				bledevices.forEach(function(device,index) {
-					if (device.gatt.connected) {
-						$("#bletable").append("<span class='badge badge-success'>OK</span>" + device.name + " <i>" + device.id.substring(0,5) + "...</i> <input style='margin-left: 10px;' class='btn btn-sm btn-danger' type='button' onclick='disconnectble("+index+")' value='disconnect'/><br/>");
-					} else {
-						$("#bletable").append("<span class='badge badge-secondary'>KO</span>" + device.name + " <i>" + device.id.substring(0,5) + "...</i><br/>");
-					}
-				});
-			}
-			function pushdevice(device) {
-				var found = false;
-				bledevices.forEach(function(dev) {
-					if (device.id == dev.id) { found = true; }
-				});
-				if (!found) { bledevices.push(device); }
-				refreshBleTable();
-			}
-			
-			function disconnectble(deviceindex) {
-				bledevices[deviceindex].gatt.disconnect();
-			}
-			
-			setInterval(refreshBleTable, 2000);
-			
-			$("#scanble").click( function () {
-				navigator.bluetooth.requestDevice({ filters: [{ services: [MIDI_SERVICE_UID] }] })
-				.then(device => {
-					var serv = device.gatt.connect();
-					pushdevice(device);
-					return serv;
-				})
-				.then(server => server.getPrimaryService(MIDI_SERVICE_UID))
-				.then( service => {
-					bleservice = service;
-					return bleservice.getCharacteristic(MIDI_CHAR_DATAIO);
-				})				
-				.then( characteristic => {
-					mididataio = characteristic;
-					return mididataio.startNotifications();
-				})
-				.then(_ => {
-					console.log('> Notifications started');
-					mididataio.addEventListener('characteristicvaluechanged', handleNotifications);
-				})
-				.catch(error => { console.log(error); });
-			});
-			
-			
-			
-			
-			function handleNotifications(event) {
-				let act = event.target.value.getUint8(2);
-				let note = event.target.value.getUint8(3);				
-				let vel = event.target.value.getUint8(4);
-				  /*let a = [];
-				  for (let i = 0; i < value.byteLength; i++) {
-					a.push( value.getUint8(i) );
-				  }
-				  console.log('> ' + a.join(' '));
-				  if (a[3] == 38 || a[3] == 41 || a[3] == 43 || a[3] == 42) {
-					playnote(a[3]);
-				  }*/
-				if (act==153) // note on
-				{	
-					playnote(note,vel);				  
-				}
-			}
-			
-			
-			</script>
-		
-	</body>
+    <script type="text/javascript">
+
+        /*
+        * MIDI Parser<br />
+        * includes all of MIDI 1.0 specification
+        *
+        * @author K.Shoji
+        * @converted to html Javascript
+        */
+        const PARAMETER_MODE_NONE = 0;
+        const PARAMETER_MODE_RPN = 1;
+        const PARAMETER_MODE_NRPN = 2;
+        const MIDI_STATE_TIMESTAMP = 0;
+        const MIDI_STATE_WAIT = 1;
+        const MIDI_STATE_SIGNAL_2BYTES_2 = 21;
+        const MIDI_STATE_SIGNAL_3BYTES_2 = 31;
+        const MIDI_STATE_SIGNAL_3BYTES_3 = 32;
+        const MIDI_STATE_SIGNAL_SYSEX = 41;
+
+        class MidiParser {
+            constructor() {
+                this.midiState = MIDI_STATE_TIMESTAMP;
+                this.midiEventKind = 0;
+                this.midiEventNote = 0;
+                this.midiEventVelocity = 0;
+                this.parameterMode = PARAMETER_MODE_NONE;
+                this.parameterNumber = 0x3ff;
+                this.parameterValue = 0x3ff;
+                this.sysExBuff = [];
+                this.timestamp = 0;
+                this.midiInputEventListener = null;
+
+                this.midiState = MIDI_STATE_TIMESTAMP;
+                this.midiEventKind = 0;
+                this.midiEventNote = 0;
+                this.midiEventVelocity = 0;
+            }
+
+            parseMidiEvent(header, event, index) {
+
+                let midiEvent = event & 0xFF;
+
+                if (this.midiState == MIDI_STATE_TIMESTAMP) {
+                    this.timestamp = ((header & 0x3f) << 7) | (event & 0x7f);
+                    this.midiState = MIDI_STATE_WAIT;
+
+
+                } else if (this.midiState == MIDI_STATE_WAIT) {
+                    switch (midiEvent & 0xf0) {
+                        case 0xf0: {
+                            switch (midiEvent) {
+                                case 0xf0:
+                                    this.sysExBuff = [];
+                                    this.sysExBuff.push(midiEvent);
+                                    this.midiState = MIDI_STATE_SIGNAL_SYSEX;
+                                    break;
+
+                                case 0xf1:
+                                case 0xf3:
+                                    // 0xf1 MIDI Time Code Quarter Frame. : 2bytes
+                                    // 0xf3 Song Select. : 2bytes
+                                    this.midiEventKind = midiEvent;
+                                    this.midiState = MIDI_STATE_SIGNAL_2BYTES_2;
+                                    break;
+
+                                case 0xf2:
+                                    // 0xf2 Song Position Pointer. : 3bytes
+                                    this.midiEventKind = midiEvent;
+                                    this.midiState = MIDI_STATE_SIGNAL_3BYTES_2;
+                                    break;
+
+                                case 0xf6:
+                                    // 0xf6 Tune Request : 1byte
+                                    // midiInputEventListener.onMidiTuneRequest(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                case 0xf8:
+                                    // 0xf8 Timing Clock : 1byte                                    \
+                                    // SOLVE midiInputEventListener.onMidiTimingClock(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                case 0xfa:
+                                    // 0xfa Start : 1byte
+                                    // SOLVE midiInputEventListener.onMidiStart(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                case 0xfb:
+                                    // 0xfb Continue : 1byte
+                                    // SOLVE midiInputEventListener.onMidiContinue(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                case 0xfc:
+                                    // 0xfc Stop : 1byte
+                                    // SOLVE midiInputEventListener.onMidiStop(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                case 0xfe:
+                                    // 0xfe Active Sensing : 1byte
+                                    // SOLVE midiInputEventListener.onMidiActiveSensing(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                case 0xff:
+                                    // 0xff Reset : 1byte
+                                    // SOLVE midiInputEventListener.onMidiReset(sender);
+                                    sendEvent([midiEvent]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
+                            break;
+
+                        case 0x80:
+                        case 0x90:
+                        case 0xa0:
+                        case 0xb0:
+                        case 0xe0:
+                            // 3bytes pattern
+                            this.midiEventKind = midiEvent;
+                            this.midiState = MIDI_STATE_SIGNAL_3BYTES_2;
+                            break;
+                        case 0xc0: // program change
+                        case 0xd0: // channel after-touch
+                            // 2bytes pattern
+                            this.midiEventKind = midiEvent;
+                            this.midiState = MIDI_STATE_SIGNAL_2BYTES_2;
+                            break;
+                        default:
+                            // 0x00 - 0x70: running status
+                            if ((this.midiEventKind & 0xf0) != 0xf0) {
+                                // previous event kind is multi-bytes pattern
+                                this.midiEventNote = midiEvent;
+                                this.midiState = MIDI_STATE_SIGNAL_3BYTES_3;
+                            }
+                            break;
+                    }
+
+
+                } else if (this.midiState == MIDI_STATE_SIGNAL_2BYTES_2) {
+                    switch (this.midiEventKind & 0xf0) {
+                        // 2bytes pattern
+                        case 0xc0: // program change
+                            this.midiEventNote = midiEvent;
+                            //midiInputEventListener.onMidiProgramChange(sender, midiEventKind & 0xf, midiEventNote);
+                            sendEvent([this.midiEventKind, this.midiEventNote]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        case 0xd0: // channel after-touch
+                            this.midiEventNote = midiEvent;
+                            //midiInputEventListener.onMidiChannelAftertouch(sender, midiEventKind & 0xf, midiEventNote);
+                            sendEvent([this.midiEventKind, this.midiEventNote]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        case 0xf0: {
+                            switch (this.midiEventKind) {
+                                case 0xf1:
+                                    // 0xf1 MIDI Time Code Quarter Frame. : 2bytes
+                                    this.midiEventNote = midiEvent;
+                                    //midiInputEventListener.onMidiTimeCodeQuarterFrame(sender, midiEventNote);
+                                    sendEvent([this.midiEventKind, this.midiEventNote]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+                                case 0xf3:
+                                    // 0xf3 Song Select. : 2bytes
+                                    this.midiEventNote = midiEvent;
+                                    //midiInputEventListener.onMidiSongSelect(sender, midiEventNote);
+                                    sendEvent([this.midiEventKind, this.midiEventNote]);
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+                                default:
+                                    // illegal state
+                                    this.midiState = MIDI_STATE_TIMESTAMP;
+                                    break;
+                            }
+                        }
+                            break;
+
+                        default:
+                            // illegal state
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                    }
+
+
+                } else if (this.midiState == MIDI_STATE_SIGNAL_3BYTES_2) {
+                    switch (this.midiEventKind & 0xf0) {
+                        case 0x80:
+                        case 0x90:
+                        case 0xa0:
+                        case 0xb0:
+                        case 0xe0:
+                        case 0xf0:
+                            // 3bytes pattern
+                            this.midiEventNote = midiEvent;
+                            this.midiState = MIDI_STATE_SIGNAL_3BYTES_3;
+                            break;
+                        default:
+                            // illegal state
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                    }
+
+
+                } else if (this.midiState == MIDI_STATE_SIGNAL_3BYTES_3) {
+                    switch (this.midiEventKind & 0xf0) {
+                        // 3bytes pattern
+                        case 0x80: // note off
+                            this.midiEventVelocity = midiEvent;
+                            //midiInputEventListener.onMidiNoteOff(sender, midiEventKind & 0xf, midiEventNote, midiEventVelocity);
+                            sendEvent([this.midiEventKind, this.midiEventNote, this.midiEventVelocity]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        case 0x90: // note on
+                            this.midiEventVelocity = midiEvent;
+                            if (this.midiEventVelocity == 0) {
+                                //midiInputEventListener.onMidiNoteOff(sender, midiEventKind & 0xf, midiEventNote, midiEventVelocity);
+                                sendEvent([(0x80 | (this.midiEventKind & 0xF0)), this.midiEventNote, this.midiEventVelocity]);
+                            } else {
+                                sendEvent([this.midiEventKind, this.midiEventNote, this.midiEventVelocity]);
+                            }
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        case 0xa0: // control polyphonic key pressure
+                            this.midiEventVelocity = midiEvent;
+                            //midiInputEventListener.onMidiPolyphonicAftertouch(sender, midiEventKind & 0xf, midiEventNote, midiEventVelocity);
+                            sendEvent([this.midiEventKind, this.midiEventNote, this.midiEventVelocity]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+
+                        case 0xb0: // control change
+                            this.midiEventVelocity = midiEvent;
+                            switch (this.midiEventNote & 0x7f) {
+                                case 98:
+                                    // NRPN LSB
+                                    this.parameterNumber &= 0x3f80;
+                                    this.parameterNumber |= this.midiEventVelocity & 0x7f;
+                                    this.parameterMode = PARAMETER_MODE_NRPN;
+                                    break;
+                                case 99:
+                                    // NRPN MSB
+                                    this.parameterNumber &= 0x007f;
+                                    this.parameterNumber |= (this.midiEventVelocity & 0x7f) << 7;
+                                    this.parameterMode = PARAMETER_MODE_NRPN;
+                                    break;
+                                case 100:
+                                    // RPN LSB
+                                    this.parameterNumber &= 0x3f80;
+                                    this.parameterNumber |= this.midiEventVelocity & 0x7f;
+                                    this.parameterMode = PARAMETER_MODE_RPN;
+                                    break;
+                                case 101:
+                                    // RPN MSB
+                                    this.parameterNumber &= 0x007f;
+                                    this.parameterNumber |= (this.midiEventVelocity & 0x7f) << 7;
+                                    this.parameterMode = PARAMETER_MODE_RPN;
+                                    break;
+                                case 38:
+                                    // data LSB
+                                    this.parameterValue &= 0x3f80;
+                                    this.parameterValue |= this.midiEventVelocity & 0x7f;
+
+                                    if (this.parameterNumber != 0x3fff) {
+                                        if (this.parameterMode == PARAMETER_MODE_RPN) {
+                                            //midiInputEventListener.onRPNMessage(sender, midiEventKind & 0xf, parameterNumber & 0x3fff, parameterValue & 0x3fff);
+                                            // TO SOLVE ...
+                                        } else if (this.parameterMode == PARAMETER_MODE_NRPN) {
+                                            //midiInputEventListener.onNRPNMessage(sender, midiEventKind & 0xf, parameterNumber & 0x3fff, parameterValue & 0x3fff);
+                                            // TO SOLVE ...
+                                        }
+                                    }
+                                    break;
+
+                                case 6:
+                                    // data MSB
+                                    this.parameterValue &= 0x007f;
+                                    this.parameterValue |= (this.midiEventVelocity & 0x7f) << 7;
+
+                                    if (this.parameterNumber != 0x3fff) {
+                                        if (this.parameterMode == PARAMETER_MODE_RPN) {
+                                            //midiInputEventListener.onRPNMessage(sender, midiEventKind & 0xf, parameterNumber & 0x3fff, parameterValue & 0x3fff);
+                                            // TO SOLVE ...
+                                        } else if (this.parameterMode == PARAMETER_MODE_NRPN) {
+                                            //midiInputEventListener.onNRPNMessage(sender, midiEventKind & 0xf, parameterNumber & 0x3fff, parameterValue & 0x3fff);
+                                            // TO SOLVE ...
+                                        }
+                                    }
+                                    break;
+                            }
+                            //midiInputEventListener.onMidiControlChange(sender, midiEventKind & 0xf, midiEventNote, midiEventVelocity);
+                            sendEvent([this.midiEventKind, this.midiEventNote, this.midiEventVelocity]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        case 0xe0: // pitch bend
+                            this.midiEventVelocity = midiEvent;
+                            //midiInputEventListener.onMidiPitchWheel(sender, midiEventKind & 0xf, (midiEventNote & 0x7f) | ((midiEventVelocity & 0x7f) << 7));
+                            // TO CHECK, seems missing bytes ...
+                            sendEvent([this.midiEventKind, (this.midiEventNote & 0x7f) , (this.midiEventVelocity & 0x7f) ]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        case 0xf0: // Song Position Pointer.
+                            this.midiEventVelocity = midiEvent;
+                            //midiInputEventListener.onMidiSongPositionPointer(sender, (midiEventNote & 0x7f) | ((midiEventVelocity & 0x7f) << 7));
+                            // TO CHECK, seems missing bytes ...
+                            sendEvent([this.midiEventKind, (this.midiEventNote & 0x7f) , (this.midiEventVelocity & 0x7f)]);
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                        default:
+                            // illegal state
+                            this.midiState = MIDI_STATE_TIMESTAMP;
+                            break;
+                    }
+
+
+
+                } else if (this.midiState == MIDI_STATE_SIGNAL_SYSEX) {
+                    if ((index == 1) && ((midiEvent & 0x80) == 0x80)) {
+                        //cancel SYSEx chain
+                        this.sysExBuff = [];
+                        this.midiState = MIDI_STATE_TIMESTAMP;
+                    }
+
+                    if (midiEvent == 0xf7) {
+                        // the end of message
+                        this.sysExBuff.push(midiEvent);
+                        sendEvent(this.sysExBuff);
+                        this.midiState = MIDI_STATE_TIMESTAMP;
+                    } else if ((midiEvent & 0x80) == 0) {
+                        this.sysExBuff.push(midiEvent);
+                    }
+                }
+            }
+        }
+
+
+        /* ========== MISC ========= */
+
+
+        /* ======== WEB AUDIO API PART (using HOWLER) ============== */
+
+        var snaresound = new Howl({
+            src: ['http://freewavesamples.com/files/Korg-TR-Rack-Standard-Kit-Snare-Drum-6.wav']
+        })
+
+        function playsnare() {
+            snaresound.play();
+        }
+
+
+        /* ============== 	MIDI I/O PART 	================== */
+
+        var midiinputs;
+        var midioutputs;
+        let USBmidiout = null;
+        let USBmidiin = null;
+        var userSelOutput = null;
+        var userSelInput = null;
+
+        var msOffset = 0;
+        const MAX_MS = 0x01FFF; //13 bits, 8192 dec
+
+        var oParse = new MidiParser();
+
+        function onMIDIMessage(event) {
+
+            let a = [];
+            for (let i = 0; i < event.data.byteLength; i++) {
+                a.push(event.data[i].toString(16));
+            }
+            console.log('[MIDI READ from ' + event.target.name + '] ' + a.join(' '));
+
+
+            sendBLEdata(event);
+        }
+
+        //$("#scanbtn").click( function () {
+        navigator.requestMIDIAccess({ sysex: true })
+            .then(function (access) {
+
+                // Get lists of available MIDI controllers
+                midiinputs = Array.from(access.inputs.values());
+                midioutputs = Array.from(access.outputs.values());
+
+                displayMidiDevices();
+
+                access.onstatechange = function (e) {
+                    // Print information about the (dis)connected MIDI controller
+                    console.log(e.port.name, e.port.manufacturer, e.port.state);
+                    midiinputs = Array.from(access.inputs.values());
+                    midioutputs = Array.from(access.outputs.values());
+                    displayMidiDevices();
+                };
+            });
+        //});
+
+        function displayMidiDevices() {
+            $("#midiports").html("");
+            midiinputs.forEach(function (dev, idx) {
+                if (getMidiId(idx) == userSelInput || (userSelInput == null && dev.name.indexOf("USB") > -1)) {
+                    USBmidiin = dev;
+                    dev.onmidimessage = onMIDIMessage;
+                    $("#midiports").append("<p class='alert alert-success' id='" + dev.id + "' onclick='selectMidiIn(" + idx + ");'> <span class='badge badge-success'>SELECTED IN</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>");
+                } else {
+                    $("#midiports").append("<p class='alert alert-secondary' id='" + dev.id + "' onclick='selectMidiIn(" + idx + ");'> <span class='badge badge-secondary'>IN</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>");
+                }
+                //$("#midiports").append("<p class='alert alert-secondary' id='" + dev.id + "'> <span class='badge badge-secondary'>IN</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>");
+
+            });
+
+            midioutputs.forEach(function (dev, idx) {
+                if (getMidiId(idx) == userSelOutput || (userSelOutput == null && dev.name.indexOf("USB") > -1)) {
+                    USBmidiout = dev;
+                    $("#midiports").append("<p class='alert alert-success' id='" + dev.id + "' onclick='selectMidiOut(" + idx + ");'> <span class='badge badge-success'>SELECTED OUT</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>");
+                } else {
+                    $("#midiports").append("<p class='alert alert-secondary' id='" + dev.id + "' onclick='selectMidiOut(" + idx + ");'> <span class='badge badge-secondary'>OUT</span> " + dev.id + " : " + dev.name + " (" + dev.state + ")</p>");
+                }
+            });
+        }
+
+
+        function selectMidiOut(idx) {
+            USBmidiout = midioutputs[idx];
+            userSelOutput = getMidiId(idx);
+            displayMidiDevices();
+        }
+
+        function selectMidiIn(idx) {
+            USBmidiin = midiinputs[idx];
+            userSelInput = getMidiId(idx);
+            displayMidiDevices();
+        }
+
+        function getMidiId(id) {
+            return "midi" + id;
+        }
+
+
+        $("#playnote").click(function () { playnote(0x90, 38, 100); });
+
+
+        function playnote(act, note, vel) {
+            if (USBmidiout != null) {
+                var noteMessage = [act, note, vel];    // note on, middle C, full velocity
+                USBmidiout.send(noteMessage);		   //omitting the timestamp means send immediately.
+                //USBmidiout.send([0x80, note, 0x40]); // Inlined array creation- note off, middle C,
+            }
+        }
+
+
+        function sendEvent(buffer) {
+            if (USBmidiout != null) {
+
+                let a = [];
+                for (let i = 0; i < buffer.length; i++) {
+                    if (buffer[i] == null) {
+                        a.push('<null>');
+                    } else {
+                        a.push(buffer[i].toString(16));
+                    }
+                }
+                console.log('[MIDI SEND] ' + a.join(' '));
+
+                USBmidiout.send(buffer, buffer.length); // send anything
+
+            }
+        }
+
+
+
+        /* =============	BLUETOOTH BLE PART 	================== */
+        const MIDI_SERVICE_UID = "03b80e5a-ede8-4b33-a751-6ce34ec4c700";
+        const MIDI_CHAR_DATAIO = "7772e5db-3868-4112-a1a9-f2669d106bf3";
+
+        var bleservice = null
+        var mididataio = null;
+
+        var bledevices = [];
+
+        function refreshBleTable() {
+            $("#bletable").html("");
+            bledevices.forEach(function (device, index) {
+                if (device.gatt.connected) {
+                    $("#bletable").append("<span class='badge badge-success'>OK</span>" + device.name + " <i>" + device.id.substring(0, 5) + "...</i> <input style='margin-left: 10px;' class='btn btn-sm btn-danger' type='button' onclick='disconnectble(" + index + ")' value='disconnect'/><br/>");
+
+                    var d = new Date();
+                    msOffset = d.getTime();
+
+                } else {
+                    $("#bletable").append("<span class='badge badge-secondary'>KO</span>" + device.name + " <i>" + device.id.substring(0, 5) + "...</i><br/>");
+                }
+            });
+        }
+        function pushdevice(device) {
+            var found = false;
+            bledevices.forEach(function (dev) {
+                if (device.id == dev.id) { found = true; }
+            });
+            if (!found) { bledevices.push(device); }
+            refreshBleTable();
+        }
+
+        function disconnectble(deviceindex) {
+            bledevices[deviceindex].gatt.disconnect();
+        }
+
+        setInterval(refreshBleTable, 2000);
+
+        $("#scanble").click(function () {
+            navigator.bluetooth.requestDevice({ filters: [{ services: [MIDI_SERVICE_UID] }] })
+                .then(device => {
+                    var serv = device.gatt.connect();
+                    pushdevice(device);
+                    return serv;
+                })
+                .then(server => server.getPrimaryService(MIDI_SERVICE_UID))
+                .then(service => {
+                    bleservice = service;
+                    return bleservice.getCharacteristic(MIDI_CHAR_DATAIO);
+                })
+                .then(characteristic => {
+                    mididataio = characteristic;
+                    return mididataio.startNotifications();
+                })
+                .then(_ => {
+                    console.log('> Notifications started');
+                    mididataio.addEventListener('characteristicvaluechanged', handleNotifications);
+                })
+                .catch(error => { console.log(error); });
+        });
+
+
+        function handleNotifications(event) {
+
+            let a = [];
+            for (let i = 0; i < event.target.value.byteLength; i++) {
+                a.push(event.target.value.getUint8(i).toString(16));
+            }
+            console.log('[BLE READ] ' + a.join(' '));
+
+            if (event.target.value.byteLength > 1) {
+                var header = event.target.value.getUint8(0) & 0xff;
+                for (let i = 1; i < event.target.value.byteLength; i++) {
+                    oParse.parseMidiEvent(header, event.target.value.getUint8(i), i);
+                }
+            }
+        }
+
+
+        function sendBLEdata(event) {
+
+            if (mididataio == null) return;
+
+            let msgBuf = []; //Outgoing buffer
+            let a = [];
+
+            //let currentMillis = event.timeStamp;
+            let currentMillis = new Date().getTime();
+            console.log('[BLE TimeStamp] ' + currentMillis);
+
+            var currentTimeStamp = MAX_MS & currentMillis;
+            msgBuf.push((0x80 | (currentTimeStamp >> 7))); //6 bits plus MSB
+            msgBuf.push((0x80 | (currentTimeStamp & 0x3F))); //7 bits plus MSB
+
+            //msgBuf.push(0x80); // no timestamp
+            //msgBuf.push(0x80);
+
+            a.push(msgBuf[0].toString(16));
+            a.push(msgBuf[1].toString(16));
+            for (let i = 0; i < event.data.byteLength; i++) {
+                msgBuf.push(event.data[i]);
+                a.push(event.data[i].toString(16));
+            }
+            console.log('[BLE SEND] ' + a.join(' '));
+
+            // HERE NEEDS IMPROVEMENTS TO SEND SYSEX DATA CORRECTLY
+
+            msgBuf.push(0xF7); //to force asnwer
+            let view = new Uint8Array(msgBuf);
+
+            mididataio.writeValueWithoutResponse(view);
+            //mididataio.writeValueWithoutResponse(new Uint8Array([0xf7]));  // force response
+
+        }
+
+
+
+
+
+
+
+
+        /*
+         * https://github.com/philipPF/flexiblemidi
+         * https://learn.sparkfun.com/tutorials/midi-ble-tutorial/full-midi-ble-converter
+         * https://github.com/skratchdot/ble-midi
+         * https://www.w3.org/TR/webmidi/
+         * https://docs.silabs.com/bluetooth/2.13/code-examples/applications/midi-over-ble
+         * http://www.java2s.com/Open-Source/Android_Free_Code/Hardware/driver/jp_kshoji_blemidi_utilMidiParser_java.htm
+         */
+
+
+    </script>
+
+</body>
 </html>
