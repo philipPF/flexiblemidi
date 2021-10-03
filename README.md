@@ -1,5 +1,9 @@
 # FlexiBLE MIDI 
 
+#IMPROVEMENTS:
+- midi router IN => BLE => OUT
+- SysEx data handling
+
 FlexiBLE MIDI is a webpage created in december 2017 for Chrome on Android phone, to :  
 
 *   Pair one or multiple bluetooth MIDI devices (like Korg microKey Air, Freedrums, etc...)
